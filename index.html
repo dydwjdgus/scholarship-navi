@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>장학 내비</title>
+  <!-- 디자인 파일 (GitHub Pages 배포를 위해 상대경로 사용) -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== 위: 제목 영역 ===== -->
+    <header class="card header">
+      <h1>장학 내비</h1>
+      <p>성적을 입력하면 가천대 교내장학금과 국가장학금 기준을 충족하는지 알려드려요.</p>
+    </header>
+
+    <!-- ===== 가운데: 성적 입력 폼 ===== -->
+    <main>
+      <form id="grade-form" class="card" novalidate>
+        <h2>내 성적 입력</h2>
+
+        <!-- 직전 학기 평점 (4.5 만점) -->
+        <label for="gpa">직전 학기 평점</label>
+        <input type="number" id="gpa" min="0" max="4.5" step="0.01" placeholder="예: 3.75">
+
+        <!-- 직전 학기 이수학점 -->
+        <label for="credits">직전 학기 이수학점</label>
+        <input type="number" id="credits" min="0" max="30" step="1" placeholder="예: 18">
+
+        <!-- 소득분위 (학자금 지원구간 0~10구간) -->
+        <label for="income">소득분위 (학자금 지원구간)</label>
+        <select id="income">
+          <option value="">선택하세요</option>
+          <option value="unknown">모름 / 미신청</option>
+          <option value="0">0구간 (기초·차상위)</option>
+          <option value="1">1구간</option>
+          <option value="2">2구간</option>
+          <option value="3">3구간</option>
+          <option value="4">4구간</option>
+          <option value="5">5구간</option>
+          <option value="6">6구간</option>
+          <option value="7">7구간</option>
+          <option value="8">8구간</option>
+          <option value="9">9구간</option>
+          <option value="10">10구간</option>
+        </select>
+
+        <button type="submit">확인하기</button>
+      </form>
+
+      <!-- ===== 아래: 결과 영역 (script.js가 내용을 채움) ===== -->
+      <section id="result" class="card">
+        <h2>결과</h2>
+        <div id="result-list">
+          <p class="placeholder">성적을 입력하고 [확인하기]를 눌러주세요.</p>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- 데이터(data.js)를 먼저 불러와야 script.js에서 SCHOLARSHIPS를 쓸 수 있음 -->
+  <script src="./data.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
