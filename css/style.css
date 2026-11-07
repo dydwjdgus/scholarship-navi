@@ -432,6 +432,59 @@ h1, h2, h3, p {
   border-color: var(--primary);
 }
 
+/* "첫 학기라 성적 없음" 체크박스 */
+.first-term {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 20px;
+  border-radius: var(--radius-input);
+  background: var(--card-bg);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.check-row .label-sub {
+  font-weight: 500;
+  color: var(--text-weak);
+}
+
+.check-row input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* 2학년 이상이면 첫 학기 체크박스를 흐리게 */
+.first-term.is-disabled {
+  opacity: 0.45;
+}
+
+.first-term.is-disabled .check-row,
+.first-term.is-disabled .check-row input {
+  cursor: not-allowed;
+}
+
+/* 첫 학기 체크 시 꺼진 성적 칸 */
+.field.is-disabled {
+  opacity: 0.45;
+}
+
+.field.is-disabled input {
+  cursor: not-allowed;
+}
+
 /* 잘못 입력한 칸 */
 .field.invalid .input-box,
 .field.invalid select {
@@ -502,7 +555,7 @@ h1, h2, h3, p {
 
 .count-boxes {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -525,6 +578,8 @@ h1, h2, h3, p {
 }
 
 .count-box.pass { background: var(--primary-bg); color: var(--primary); }
+/* 확인 필요: 흰 바탕 + 파란 테두리 (충족의 파란 바탕과 구분) */
+.count-box.check { background: var(--white); color: var(--primary); box-shadow: inset 0 0 0 1.5px var(--primary); }
 .count-box.near { background: var(--warn-bg); color: var(--warn); }
 .count-box.none { background: var(--gray-bg); color: var(--text-sub); }
 
@@ -586,6 +641,7 @@ h1, h2, h3, p {
 
 .badge.pass { background: var(--primary-bg); color: var(--primary); }
 .badge.near { background: var(--warn-bg); color: var(--warn); }
+.badge.check { background: var(--white); color: var(--primary); box-shadow: inset 0 0 0 1.5px var(--primary); }
 
 /* 기준별 줄 (항목명 ↔ 판정) */
 .criteria {
@@ -611,6 +667,17 @@ h1, h2, h3, p {
 
 .criteria .judge.short {
   color: var(--warn);
+}
+
+/* 확인 불가 조건 */
+.criteria .judge.unknown {
+  color: var(--primary);
+}
+
+/* 판정 글자는 줄바꿈 없이 오른쪽 정렬, 조건 이름이 길면 이름 쪽이 줄바꿈 */
+.criteria .judge {
+  flex: none;
+  text-align: right;
 }
 
 /* 지원 금액 + 신청 방법 */
@@ -641,6 +708,11 @@ h1, h2, h3, p {
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-sub);
+}
+
+/* 안내 문장이 여러 개면 문장 사이 간격 */
+.goal p + p {
+  margin-top: 4px;
 }
 
 /* 해당 없음 한 줄 카드 */
