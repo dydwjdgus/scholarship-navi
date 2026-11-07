@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>성적 입력 · 장학 내비</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body data-page="input">
+
+  <!-- ===== 상단 바 ===== -->
+  <header class="topbar">
+    <div class="wrap">
+      <a href="./index.html" class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M16 8l-2.5 5.5L8 16l2.5-5.5z"></path></svg>
+        <span>장학 내비</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ===== 입력 폼 (가운데 560px) ===== -->
+  <main class="input-main">
+    <div class="input-head">
+      <a href="./index.html" class="back-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        처음으로
+      </a>
+      <h1>직전 학기 성적을<br>알려주세요</h1>
+      <p>지금은 1학년 기준으로 안내해요. 입력한 정보는 저장되지 않아요.</p>
+    </div>
+
+    <!-- novalidate: 브라우저 기본 검사 대신 app.js에서 직접 검사 -->
+    <form id="grade-form" class="input-main-form" novalidate>
+      <div class="fields">
+
+        <!-- 1. 평점 -->
+        <div class="field">
+          <label for="gpa">직전 학기 평점 평균</label>
+          <div class="input-box">
+            <input id="gpa" type="text" inputmode="decimal" placeholder="예: 3.80" autocomplete="off">
+            <span class="unit">/ 4.5</span>
+          </div>
+          <p class="error-msg" hidden></p>
+        </div>
+
+        <!-- 2. 이수학점 -->
+        <div class="field">
+          <label for="credits">직전 학기 이수학점</label>
+          <div class="input-box">
+            <input id="credits" type="text" inputmode="numeric" placeholder="예: 18" autocomplete="off">
+            <span class="unit">학점</span>
+          </div>
+          <p class="error-msg" hidden></p>
+        </div>
+
+        <!-- 3. 소득구간 (값: 기초·차상위=0, 1~10구간=1~10, 모름=unknown) -->
+        <div class="field">
+          <label for="income">소득구간 <span class="label-sub">(국가장학금 확인용)</span></label>
+          <select id="income">
+            <option value="" disabled selected>선택해 주세요</option>
+            <option value="0">기초·차상위</option>
+            <option value="1">1구간</option>
+            <option value="2">2구간</option>
+            <option value="3">3구간</option>
+            <option value="4">4구간</option>
+            <option value="5">5구간</option>
+            <option value="6">6구간</option>
+            <option value="7">7구간</option>
+            <option value="8">8구간</option>
+            <option value="9">9구간</option>
+            <option value="10">10구간</option>
+            <option value="unknown">잘 모르겠어요</option>
+          </select>
+          <p class="error-msg" hidden></p>
+          <p class="help">소득구간은 한국장학재단 홈페이지에서 확인할 수 있어요.</p>
+        </div>
+
+      </div>
+
+      <!-- 세 칸이 모두 올바르면 활성화됨 -->
+      <button type="submit" id="submit-btn" class="btn-primary btn-block" disabled>결과 보기</button>
+    </form>
+  </main>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+/* =====================================================
+   장학 내비 공통 스타일
+   - 디자인 토큰(색, 모서리 등)은 :root 변수에 모아둠 → 여기만 바꾸면 전체에 반영
+   - 기준 화면: PC (모바일 전용 레이아웃 없음, 카드만 자동 줄바꿈)
+   ===================================================== */
+
+/* ===== 디자인 토큰 ===== */
+:root {
+  --primary: #1B64DA;        /* 메인 색 (버튼·강조) */
+  --primary-hover: #1550B0;
+  --primary-bg: #E8F3FF;     /* 메인 연한 배경 */
+  --warn: #B4400B;           /* 주의(조금 부족) 글자 */
+  --warn-bg: #FFF3E8;        /* 주의 배경 */
+  --text: #191F28;           /* 본문 글자 */
+  --text-strong-sub: #333D4B;
+  --text-sub: #4E5968;       /* 보조 글자 */
+  --text-weak: #6B7684;      /* 더 연한 보조 */
+  --gray-bg: #F2F4F6;        /* 회색 배경 / 입력칸 */
+  --card-bg: #F9FAFB;        /* 카드 배경 */
+  --border: #E5E8EB;         /* 테두리 */
+  --white: #FFFFFF;
+
+  --radius-card: 24px;
+  --radius-btn: 16px;
+  --radius-input: 14px;
+  --radius-chip: 999px;
+}
+
+/* ===== 기본 ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--white);
+  color: var(--text);
+  font-family: 'Noto Sans KR', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* 결과 화면은 회색 배경 */
+body.page-gray {
+  background: var(--gray-bg);
+}
+
+a {
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+/* 페이지 가로 폭 (홈·상단 바 기준 1080px) */
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== 상단 바 ===== */
+.topbar {
+  border-bottom: 1px solid var(--gray-bg);
+  background: var(--white);
+}
+
+.page-gray .topbar {
+  border-bottom-color: var(--border);
+}
+
+.topbar .wrap {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.logo:hover {
+  color: var(--text);
+}
+
+.logo span {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nav a {
+  color: var(--text-sub);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--primary);
+}
+
+/* ===== 버튼 ===== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 60px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  background: var(--primary);
+  color: var(--white);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  color: var(--white);
+}
+
+/* 입력이 덜 됐을 때 비활성 버튼 */
+.btn-primary:disabled {
+  background: #B0C9F0;
+  cursor: not-allowed;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* 회색 작은 버튼 (다시 입력하기) */
+.btn-sub {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: var(--gray-bg);
+  color: var(--text-strong-sub);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-sub:hover {
+  background: var(--border);
+  color: var(--text-strong-sub);
+}
+
+/* =====================================================
+   화면 1 — 홈
+   ===================================================== */
+.hero {
+  padding: 112px 0 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.pill {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: var(--radius-chip);
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hero h1 {
+  font-size: 56px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.hero p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--text-sub);
+}
+
+.hero .btn-primary {
+  margin-top: 16px;
+}
+
+/* 3단계 카드 */
+.steps {
+  padding: 0 0 96px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.step-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-card .step-no {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.step-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.step-card p,
+.kind-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-sub);
+}
+
+/* 장학금 종류 카드 */
+.kinds {
+  padding: 0 0 112px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.kinds h2 {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.kind-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.kind-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.kind-icon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--primary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kind-card > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kind-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* 푸터 */
+.footer {
+  background: var(--card-bg);
+}
+
+.footer .wrap {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-weak);
+}
+
+/* =====================================================
+   화면 2 — 성적 입력
+   ===================================================== */
+.input-main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.input-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.back-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-size: 15px;
+  color: var(--text-weak);
+  text-decoration: none;
+}
+
+.input-head h1 {
+  font-size: 32px;
+  line-height: 1.4;
+  font-weight: 800;
+}
+
+.input-head p {
+  font-size: 17px;
+  color: var(--text-sub);
+}
+
+/* 입력 칸들과 "결과 보기" 버튼 사이 간격 */
+.input-main-form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.field label .label-sub {
+  font-weight: 500;
+  color: var(--text-weak);
+}
+
+/* 회색 둥근 입력칸 (오른쪽에 단위 표시) */
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-input);
+  background: var(--gray-bg);
+}
+
+.input-box:focus-within {
+  border-color: var(--primary);
+}
+
+.input-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+}
+
+.input-box input::placeholder {
+  color: #B0B8C1;
+  font-weight: 500;
+}
+
+.input-box .unit {
+  font-size: 17px;
+  color: var(--text-weak);
+}
+
+.field select {
+  height: 60px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-input);
+  background: var(--gray-bg);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+}
+
+.field select:focus {
+  border-color: var(--primary);
+}
+
+/* 잘못 입력한 칸 */
+.field.invalid .input-box,
+.field.invalid select {
+  border-color: var(--warn);
+}
+
+.help {
+  font-size: 14px;
+  color: var(--text-weak);
+}
+
+.error-msg {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--warn);
+}
+
+/* =====================================================
+   화면 3 — 결과
+   ===================================================== */
+.result-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 흰색 카드 공통 */
+.white-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+}
+
+/* 요약 카드 */
+.summary {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary h1 {
+  font-size: 30px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.summary h1 .count {
+  color: var(--primary);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 14px;
+  border-radius: var(--radius-chip);
+  background: var(--gray-bg);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-strong-sub);
+}
+
+.count-boxes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.count-box {
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.count-box .label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.count-box .num {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.count-box.pass { background: var(--primary-bg); color: var(--primary); }
+.count-box.near { background: var(--warn-bg); color: var(--warn); }
+.count-box.none { background: var(--gray-bg); color: var(--text-sub); }
+
+/* 섹션 제목 */
+.section-title {
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* 장학금 카드 (충족 / 조금 부족) */
+.sch-card {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sch-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sch-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sch-head h3 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* 교내 / 국가 태그 */
+.tag {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--gray-bg);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+/* 충족 / 조금 부족 배지 */
+.badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--radius-chip);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.badge.pass { background: var(--primary-bg); color: var(--primary); }
+.badge.near { background: var(--warn-bg); color: var(--warn); }
+
+/* 기준별 줄 (항목명 ↔ 판정) */
+.criteria {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 16px;
+  color: var(--text-strong-sub);
+}
+
+.criteria li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.criteria .judge {
+  font-weight: 700;
+}
+
+.criteria .judge.short {
+  color: var(--warn);
+}
+
+/* 지원 금액 + 신청 방법 */
+.sch-foot {
+  border-top: 1px solid var(--gray-bg);
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 15px;
+  color: var(--text-sub);
+}
+
+.sch-foot a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* 목표 안내 회색 박스 */
+.goal {
+  padding: 16px 20px;
+  border-radius: var(--radius-input);
+  background: var(--card-bg);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-sub);
+}
+
+/* 해당 없음 한 줄 카드 */
+.none-card {
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.none-card > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.none-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.none-card .reason {
+  font-size: 15px;
+  color: var(--text-weak);
+  text-align: right;
+}
+
+/* 결과 묶음 (충족 / 조금 부족 / 해당 없음) */
+.result-group,
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.result-list {
+  gap: 16px;
+}
+
+/* hidden 속성이 붙은 요소는 항상 숨김 (위의 display 설정보다 우선) */
+[hidden] {
+  display: none !important;
+}
+
+.notice {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-weak);
+  text-align: center;
+}

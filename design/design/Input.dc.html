@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>성적 입력</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#1B64DA}a:hover{color:#1550B0}
+</style>
+</helmet>
+<div style="font-family: 'Noto Sans KR', system-ui, sans-serif; color: #191F28; background: #FFFFFF; min-height: 100vh; letter-spacing: -0.02em">
+  <header style="border-bottom: 1px solid #F2F4F6">
+    <div style="max-width: 1080px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #191F28">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M16 8l-2.5 5.5L8 16l2.5-5.5z"></path></svg>
+        <span style="font-size: 20px; font-weight: 800">장학 내비</span>
+      </a>
+    </div>
+  </header>
+
+  <main style="max-width: 560px; margin: 0 auto; padding: 64px 24px 96px; display: flex; flex-direction: column; gap: 40px">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <a href="Main.dc.html" style="display: inline-flex; align-items: center; gap: 4px; font-size: 15px; color: #6B7684; text-decoration: none; min-height: 44px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+        처음으로
+      </a>
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.4; font-weight: 800; white-space: pre-line">직전 학기 성적을
+알려주세요</h1>
+      <p style="margin: 0; font-size: 17px; color: #4E5968">지금은 1학년 기준으로 안내해요. 입력한 정보는 저장되지 않아요.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <label for="gpa" style="font-size: 15px; font-weight: 700; color: #4E5968">직전 학기 평점 평균</label>
+        <div style="display: flex; align-items: center; gap: 12px; background: #F2F4F6; border-radius: 14px; padding: 0 20px; height: 60px">
+          <input id="gpa" type="text" inputmode="decimal" value="3.80" style="flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 20px; font-weight: 700; color: #191F28; outline: none">
+          <span style="font-size: 17px; color: #6B7684">/ 4.5</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <label for="credits" style="font-size: 15px; font-weight: 700; color: #4E5968">직전 학기 이수학점</label>
+        <div style="display: flex; align-items: center; gap: 12px; background: #F2F4F6; border-radius: 14px; padding: 0 20px; height: 60px">
+          <input id="credits" type="text" inputmode="numeric" value="18" style="flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 20px; font-weight: 700; color: #191F28; outline: none">
+          <span style="font-size: 17px; color: #6B7684">학점</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <label for="income" style="font-size: 15px; font-weight: 700; color: #4E5968">소득구간 <span style="font-weight: 500; color: #6B7684">(국가장학금 확인용)</span></label>
+        <select id="income" style="height: 60px; border: 0; border-radius: 14px; background: #F2F4F6; padding: 0 20px; font: inherit; font-size: 18px; font-weight: 700; color: #191F28">
+          <option>기초·차상위</option>
+          <option>1구간</option>
+          <option>2구간</option>
+          <option>3구간</option>
+          <option selected="selected">4구간</option>
+          <option>5구간</option>
+          <option>6구간</option>
+          <option>7구간</option>
+          <option>8구간</option>
+          <option>9구간</option>
+          <option>10구간</option>
+          <option>잘 모르겠어요</option>
+        </select>
+        <p style="margin: 0; font-size: 14px; color: #6B7684">소득구간은 한국장학재단 홈페이지에서 확인할 수 있어요.</p>
+      </div>
+    </div>
+
+    <a href="Result.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 60px; border-radius: 16px; background: #1B64DA; color: #FFFFFF; font-size: 18px; font-weight: 700; text-decoration: none">결과 보기</a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

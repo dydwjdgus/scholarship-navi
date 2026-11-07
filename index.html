@@ -2,66 +2,95 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>장학 내비</title>
-  <!-- 디자인 파일 (GitHub Pages 배포를 위해 상대경로 사용) -->
-  <link rel="stylesheet" href="./style.css">
+  <!-- 폰트: Noto Sans KR -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body>
-  <div class="container">
+<body data-page="home">
 
-    <!-- ===== 위: 제목 영역 ===== -->
-    <header class="card header">
-      <h1>장학 내비</h1>
-      <p>성적을 입력하면 가천대 교내장학금과 국가장학금 기준을 충족하는지 알려드려요.</p>
-    </header>
+  <!-- ===== 상단 바 ===== -->
+  <header class="topbar">
+    <div class="wrap">
+      <a href="./index.html" class="logo">
+        <!-- 나침반 아이콘 -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M16 8l-2.5 5.5L8 16l2.5-5.5z"></path></svg>
+        <span>장학 내비</span>
+      </a>
+      <nav class="nav">
+        <a href="#kinds">장학금 종류</a>
+        <a href="./input.html">바로 확인하기</a>
+      </nav>
+    </div>
+  </header>
 
-    <!-- ===== 가운데: 성적 입력 폼 ===== -->
-    <main>
-      <form id="grade-form" class="card" novalidate>
-        <h2>내 성적 입력</h2>
+  <main class="wrap">
+    <!-- ===== 히어로 ===== -->
+    <section class="hero">
+      <span class="pill">가천대학교 학생을 위한 장학금 길잡이</span>
+      <h1>내 성적으로 받을 수 있는<br>장학금, 1분이면 알아요</h1>
+      <p>평점과 이수학점만 입력하면 교내·국가장학금 기준과 바로 비교해 드려요.</p>
+      <a href="./input.html" class="btn-primary">
+        내 장학금 찾아보기
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </section>
 
-        <!-- 직전 학기 평점 (4.5 만점) -->
-        <label for="gpa">직전 학기 평점</label>
-        <input type="number" id="gpa" min="0" max="4.5" step="0.01" placeholder="예: 3.75">
+    <!-- ===== 3단계 안내 ===== -->
+    <section class="steps">
+      <div class="step-card">
+        <span class="step-no">STEP 1</span>
+        <h3>성적 입력</h3>
+        <p>직전 학기 평점, 이수학점, 소득구간을 입력해요.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-no">STEP 2</span>
+        <h3>기준 비교</h3>
+        <p>장학금마다 정해진 기준과 하나씩 맞춰봐요.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-no">STEP 3</span>
+        <h3>결과 확인</h3>
+        <p>받을 수 있는 장학금과 아깝게 놓친 장학금을 알려줘요.</p>
+      </div>
+    </section>
 
-        <!-- 직전 학기 이수학점 -->
-        <label for="credits">직전 학기 이수학점</label>
-        <input type="number" id="credits" min="0" max="30" step="1" placeholder="예: 18">
-
-        <!-- 소득분위 (학자금 지원구간 0~10구간) -->
-        <label for="income">소득분위 (학자금 지원구간)</label>
-        <select id="income">
-          <option value="">선택하세요</option>
-          <option value="unknown">모름 / 미신청</option>
-          <option value="0">0구간 (기초·차상위)</option>
-          <option value="1">1구간</option>
-          <option value="2">2구간</option>
-          <option value="3">3구간</option>
-          <option value="4">4구간</option>
-          <option value="5">5구간</option>
-          <option value="6">6구간</option>
-          <option value="7">7구간</option>
-          <option value="8">8구간</option>
-          <option value="9">9구간</option>
-          <option value="10">10구간</option>
-        </select>
-
-        <button type="submit">확인하기</button>
-      </form>
-
-      <!-- ===== 아래: 결과 영역 (script.js가 내용을 채움) ===== -->
-      <section id="result" class="card">
-        <h2>결과</h2>
-        <div id="result-list">
-          <p class="placeholder">성적을 입력하고 [확인하기]를 눌러주세요.</p>
+    <!-- ===== 장학금 종류 ===== -->
+    <section id="kinds" class="kinds">
+      <h2>이런 장학금을 확인해요</h2>
+      <div class="kind-grid">
+        <div class="kind-card">
+          <div class="kind-icon">
+            <!-- 학교 건물 아이콘 -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V10l7-5 7 5v11"></path><path d="M10 21v-6h4v6"></path></svg>
+          </div>
+          <div>
+            <h3>교내장학금</h3>
+            <p>성적우수, 학업장려 등 가천대학교에서 직접 주는 장학금이에요.</p>
+          </div>
         </div>
-      </section>
-    </main>
+        <div class="kind-card">
+          <div class="kind-icon">
+            <!-- 깃발 아이콘 -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16"></path><path d="M4 4h12l-2 4 2 4H4"></path></svg>
+          </div>
+          <div>
+            <h3>국가장학금</h3>
+            <p>한국장학재단에서 소득구간과 성적에 따라 지원하는 장학금이에요.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  </div>
+  <!-- ===== 푸터 ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <p>결과는 참고용이에요. 정확한 선발 기준은 학교 및 한국장학재단 공지를 꼭 확인해 주세요.</p>
+      <p>AI중심세상 팀프로젝트 · [팀 이름]</p>
+    </div>
+  </footer>
 
-  <!-- 데이터(data.js)를 먼저 불러와야 script.js에서 SCHOLARSHIPS를 쓸 수 있음 -->
-  <script src="./data.js"></script>
-  <script src="./script.js"></script>
 </body>
 </html>
