@@ -2,8 +2,8 @@
 // 장학 내비 - 입력값 처리, 기준 비교, 결과 그리기
 // - 장학금 기준 숫자는 data.js(SCHOLARSHIPS, NEAR_MISS)에서만 가져옴
 // - 입력값은 저장하지 않음: input.html → result.html 로 URL 쿼리스트링으로만 전달
-//   예) result.html?grade=2&gpa=3.8&cumGpa=3.6&pct=92&credits=18&income=4
-//       result.html?grade=1&firstTerm=1&income=unknown   (첫 학기라 성적 없음)
+//   예) result.html?gpa=3.8&pct=92&credits=18&income=4
+//       result.html?firstTerm=1&income=unknown   (첫 학기라 성적 없음)
 // - <body data-page="..."> 값을 보고 페이지별 기능을 실행
 // =====================================================
 
@@ -18,14 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // 각 함수는 { ok: true, value } 또는 { ok: false, message } 를 돌려줌
 // =====================================================
 
-// 학년: 1 ~ 4
-function parseGrade(text) {
-  text = String(text || "").trim();
-  if (/^[1-4]$/.test(text)) return { ok: true, value: Number(text) };
-  return { ok: false, message: "학년을 선택해 주세요." };
-}
-
-// 소수 둘째 자리까지의 숫자를 min~max 범위로 검사하는 공통 함수
+// 소수 둘째 자리까지의 숫자를 0~max 범위로 검사하는 공통 함수
 function parseDecimal(text, max, emptyMsg, example) {
   text = String(text || "").trim();
   if (text === "") return { ok: false, message: emptyMsg };
@@ -39,14 +32,14 @@ function parseDecimal(text, max, emptyMsg, example) {
   return { ok: true, value: value };
 }
 
-// 직전 학기 평점 / 누적 평점: 0 ~ 4.5
+// 직전 학기 평점: 0 ~ 4.5
 function parseGpa(text) {
   return parseDecimal(text, 4.5, "평점을 입력해 주세요.", "3.75");
 }
 
-// 백분율 점수: 0 ~ 100
+// 직전 학기 백분위 점수: 0 ~ 100
 function parsePercent(text) {
-  return parseDecimal(text, 100, "백분율 점수를 입력해 주세요.", "92.5");
+  return parseDecimal(text, 100, "백분위 점수를 입력해 주세요.", "92.5");
 }
 
 // 이수학점: 0 이상 정수
@@ -77,14 +70,9 @@ function optional(parse) {
   };
 }
 
-// 숫자를 보기 좋게 (평점은 소수 둘째 자리 고정, 백분율은 불필요한 0 제거)
+// 숫자를 보기 좋게 (평점은 소수 둘째 자리 고정, 백분위는 불필요한 0 제거)
 function fmtGpa(v) { return v.toFixed(2); }
 function fmtPercent(v) { return String(Number(v.toFixed(2))); }
-
-// 지원구간 숫자 → 화면용 글자
-function incomeName(n) {
-  return n === 0 ? "기초·차상위(0구간)" : n + "구간";
-}
 
 function incomeLabel(income) {
   if (income === null) return "지원구간 모름";
@@ -99,21 +87,16 @@ function initInputPage() {
   const form = document.getElementById("grade-form");
   const submitBtn = document.getElementById("submit-btn");
   const firstTerm = document.getElementById("first-term");
-  const firstTermBox = firstTerm.closest(".first-term");
 
   // 칸별 설정
   //   key     : 주소(쿼리스트링)에 쓰는 이름
   //   isScore : 성적 칸 여부 (첫 학기 체크 시 꺼짐)
-  //   optional: 선택 입력 여부 (비워도 됨)
   const fields = [
-    { el: document.getElementById("grade"), parse: parseGrade, key: "grade" },
     { el: document.getElementById("gpa"), parse: parseGpa, key: "gpa", isScore: true },
-    { el: document.getElementById("cumGpa"), parse: optional(parseGpa), key: "cumGpa", isScore: true, optional: true },
-    { el: document.getElementById("pct"), parse: optional(parsePercent), key: "pct", isScore: true, optional: true },
+    { el: document.getElementById("pct"), parse: optional(parsePercent), key: "pct", isScore: true },
     { el: document.getElementById("credits"), parse: parseCredits, key: "credits", isScore: true },
     { el: document.getElementById("income"), parse: parseIncome, key: "income" }
   ];
-  const gradeField = fields[0];
 
   // 지금 검사해야 하는 칸 (첫 학기면 성적 칸은 제외)
   function activeFields() {
@@ -150,15 +133,8 @@ function initInputPage() {
     submitBtn.disabled = !allOk;
   }
 
-  // 학년·첫 학기 체크 상태를 화면에 반영
-  // - 첫 학기 체크박스는 1학년일 때만 사용 가능
-  // - 체크하면 성적 칸(직전 평점, 누적 평점, 백분율, 이수학점)이 꺼짐
+  // 첫 학기 체크 상태를 성적 칸에 반영 (체크하면 평점·백분위·이수학점 칸이 꺼짐)
   function applyFirstTerm() {
-    const isFirstYear = gradeField.el.value === "1";
-    if (!isFirstYear) firstTerm.checked = false;
-    firstTerm.disabled = !isFirstYear;
-    firstTermBox.classList.toggle("is-disabled", !isFirstYear);
-
     fields.forEach(function (f) {
       if (!f.isScore) return;
       f.el.disabled = firstTerm.checked;
@@ -184,7 +160,6 @@ function initInputPage() {
     f.el.addEventListener("change", function () {
       f.el.dataset.touched = "true";
       updateField(f, true);
-      if (f === gradeField) applyFirstTerm();
       updateButton();
     });
   });
@@ -217,34 +192,28 @@ function initInputPage() {
 // =====================================================
 function initResultPage() {
   const params = new URLSearchParams(location.search);
-  const grade = parseGrade(params.get("grade"));
+  const isFirstTerm = params.get("firstTerm") === "1";
   const income = parseIncome(params.get("income"));
-  // 첫 학기는 1학년만 가능
-  const isFirstTerm = params.get("firstTerm") === "1" && grade.ok && grade.value === 1;
 
-  // 첫 학기면 성적은 모두 null, 아니면 주소의 값을 검사 (누적 평점·백분율은 선택)
+  // 첫 학기면 성적은 모두 null, 아니면 주소의 값을 검사 (백분위는 선택)
   let gpa = { ok: true, value: null };
-  let cumGpa = { ok: true, value: null };
   let pct = { ok: true, value: null };
   let credits = { ok: true, value: null };
   if (!isFirstTerm) {
     gpa = parseGpa(params.get("gpa"));
-    cumGpa = optional(parseGpa)(params.get("cumGpa"));
     pct = optional(parsePercent)(params.get("pct"));
     credits = parseCredits(params.get("credits"));
   }
 
   // 주소의 값이 없거나 잘못됐으면 입력 화면으로 돌려보냄
-  if (![grade, income, gpa, cumGpa, pct, credits].every(function (r) { return r.ok; })) {
+  if (![income, gpa, pct, credits].every(function (r) { return r.ok; })) {
     location.replace("input.html");
     return;
   }
 
   const input = {
-    grade: grade.value,
     firstTerm: isFirstTerm,
     gpa: gpa.value,
-    cumGpa: cumGpa.value,
     percent: pct.value,
     credits: credits.value,
     income: income.value
@@ -268,10 +237,10 @@ function initResultPage() {
   };
 
   renderSummary(input, groups);
-  renderGroup("pass-list", groups.pass, renderPassCard);
-  renderGroup("check-list", groups.check, renderCheckCard);
-  renderGroup("near-list", groups.near, renderNearCard);
-  renderGroup("none-list", groups.none, renderNoneCard);
+  renderGroup("pass-list", groups.pass);
+  renderGroup("check-list", groups.check);
+  renderGroup("near-list", groups.near);
+  renderGroup("none-list", groups.none);
 }
 
 // =====================================================
@@ -281,7 +250,7 @@ function initResultPage() {
 //   "pass"    통과
 //   "short"   미달 (조금 부족: NEAR_MISS 범위 안)
 //   "fail"    미달 (많이 부족하거나 대상 아님)
-//   "unknown" 확인 불가 (사용자가 모름/비워둠, 데이터가 "모름", 입력받지 않는 조건)
+//   "unknown" 확인 불가 (사용자가 모름/비워둠, 데이터가 "모름", 자동 판정 불가 조건)
 //
 // 장학금 전체 status (미달 > 확인 불가 > 통과):
 //   fail이 하나라도 있으면        → "none"  (해당 없음)
@@ -290,72 +259,180 @@ function initResultPage() {
 //   모두 통과                     → "pass"  (충족)
 // =====================================================
 
-// 사용할 성적 값 정하기
-// - 직전 학기: 입력한 직전 학기 평점 / 백분율
-// - 누적 평점: 입력했으면 그 값. 비워뒀으면 1학년은 직전 학기 평점으로 대신(1학년 2학기는 두 값이 같음),
-//              2학년 이상은 null(확인 불가)
-// - 누적 백분율: 입력란이 하나(직전 학기 기준)뿐이라, 1학년만 같은 값으로 대신하고 2학년 이상은 null
-function scoreValues(input) {
-  const isFirstYear = input.grade === 1;
-  return {
-    prevGpa: input.gpa,
-    cumGpa: input.cumGpa !== null ? input.cumGpa : (isFirstYear ? input.gpa : null),
-    prevPercent: input.percent,
-    cumPercent: isFirstYear ? input.percent : null
-  };
+// 지원구간 n이 [lo, hi] 범위 안인지 (null = 제한 없음)
+function inIncomeRange(n, lo, hi) {
+  return (lo === null || n >= lo) && (hi === null || n <= hi);
 }
 
-// scoreBasis → 판정할 성적 종류 목록
-function basisList(basis) {
-  if (basis === "누적") return ["cum"];
-  if (basis === "둘다") return ["prev", "cum"];
-  return ["prev"]; // "직전학기" (값이 없거나 잘못돼도 직전 학기로)
-}
+// 소수 둘째 자리 정수로 바꿔 비교 (부동소수점 오차 방지)
+function to100(v) { return Math.round(v * 100); }
 
-// 평점·백분율 하나 비교 → ctx에 줄/안내 추가
-//   kind: "gpa" | "percent",  which: "prev" | "cum"
-function judgeScore(ctx, s, kind, which, value) {
-  const isGpa = kind === "gpa";
-  const min = isGpa ? s.minGpa : s.minPercent;
-  const fmt = isGpa ? fmtGpa : fmtPercent;
-  const word = isGpa ? "평점" : "백분율";
-  const label = (which === "prev" ? "직전 학기 " : "누적 ") + word;
-  const strict = s.scoreCompare === "초과";
-  const cmpWord = strict ? "초과" : "이상";
-
-  // 값이 없으면 확인 불가
-  if (value === null) {
-    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
-    if (isGpa && which === "cum") ctx.notes.push("누적 평점을 입력하면 판정할 수 있어요. (기준: " + fmt(min) + " " + cmpWord + ")");
-    else if (!isGpa && which === "prev") ctx.notes.push("백분율 점수를 입력하면 판정할 수 있어요. (기준: " + fmt(min) + "점 " + cmpWord + ")");
-    else if (!isGpa && which === "cum") ctx.notes.push("누적 백분율 기준이에요. 포털에서 누적 백분율을 확인해 주세요. (기준: " + fmt(min) + "점 " + cmpWord + ")");
+// 기준값 이상인지 비교해서 통과 / 조금 부족 / 미달 줄을 ctx에 추가
+//   opt: { label, word, min, value, fmt, unit, nearLimit, goal }
+function compareMin(ctx, opt) {
+  const minText = opt.fmt(opt.min) + opt.unit + " 이상";
+  if (to100(opt.value) >= to100(opt.min)) {
+    ctx.rows.push({ label: opt.label, text: minText + " · 충족", state: "pass" });
     return;
   }
-
-  // 소수 둘째 자리 정수로 바꿔 비교 (부동소수점 오차 방지)
-  const v100 = Math.round(value * 100);
-  const m100 = Math.round(min * 100);
-  const passed = strict ? v100 > m100 : v100 >= m100;
-  if (passed) {
-    ctx.rows.push({ label: label, text: fmt(min) + " " + cmpWord + " · 충족", state: "pass" });
-    return;
-  }
-
-  // 미달: 모자란 만큼 계산
-  const gap = (m100 - v100) / 100;
-  const text = gap === 0
-    ? fmt(min) + " 초과 필요"          // 기준값과 같은데 "초과" 기준
-    : word + " " + fmt(gap) + " 부족";
-  const nearLimit = isGpa ? NEAR_MISS.gpa : NEAR_MISS.percent;
-  if (gap <= nearLimit) {
-    ctx.rows.push({ label: label, text: text, state: "short" });
-    const target = which === "prev" ? "다음 학기 " + word : "누적 " + word;
-    const toWord = strict ? "초과로" : "이상으로";
-    ctx.goals.push(target + "을 " + fmt(min) + " " + toWord + " 올리면 받을 수 있어요.");
+  const gap = (to100(opt.min) - to100(opt.value)) / 100;
+  const text = opt.word + " " + opt.fmt(gap) + opt.unit + " 부족 (기준 " + minText + ")";
+  if (gap <= opt.nearLimit) {
+    ctx.rows.push({ label: opt.label, text: text, state: "short" });
+    ctx.goals.push(opt.goal);
   } else {
-    ctx.rows.push({ label: label, text: text, state: "fail" });
-    ctx.reasons.push(label + " 기준 미달");
+    ctx.rows.push({ label: opt.label, text: text, state: "fail" });
+    ctx.reasons.push(opt.label + " 기준 미달");
   }
+}
+
+// 1) 직전 학기 평점
+function judgeGpa(ctx, s, input) {
+  if (s.minGpa === null) return;
+  compareMin(ctx, {
+    label: "직전 학기 평점", word: "평점", min: s.minGpa, value: input.gpa,
+    fmt: fmtGpa, unit: "", nearLimit: NEAR_MISS.gpa,
+    goal: "다음 학기 평점을 " + fmtGpa(s.minGpa) + " 이상으로 올리면 받을 수 있어요."
+  });
+}
+
+// 2) 직전 학기 백분위 (지원구간별 기준·경고제 예외 포함)
+function judgePercent(ctx, s, input) {
+  if (s.minPercent === null) return;
+  const label = "직전 학기 백분위";
+  const overrides = s.percentByIncome || [];
+  const warning = s.percentWarning || null;
+
+  // 이 학생에게 적용할 기준 정하기
+  let min = s.minPercent;
+  let warnMin = null;   // 경고제로 예외 인정되는 최소 점수
+  let lowest = min;     // 지원구간을 모를 때 가능한 가장 낮은 기준
+  if (input.income !== null) {
+    overrides.forEach(function (o) {
+      if (inIncomeRange(input.income, o.incomeMin, o.incomeMax)) min = o.minPercent;
+    });
+    if (warning && inIncomeRange(input.income, warning.incomeMin, warning.incomeMax)) warnMin = warning.minPercent;
+  } else {
+    overrides.forEach(function (o) { lowest = Math.min(lowest, o.minPercent); });
+    if (warning) lowest = Math.min(lowest, warning.minPercent);
+  }
+  const varies = input.income === null && lowest < min;
+
+  // 백분위를 비워둔 경우
+  if (input.percent === null) {
+    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
+    ctx.notes.push("성적표의 백분위 점수를 입력하면 정확히 확인할 수 있어요. (기준: " +
+      fmtPercent(min) + "점 이상" + (varies ? ", 지원구간에 따라 다름" : "") + ")");
+    return;
+  }
+
+  const v = input.percent;
+  // 지원구간을 몰라서 기준이 달라질 수 있는 경우: 가장 낮은 기준과 기본 기준 사이면 확인 필요
+  if (varies && to100(v) < to100(min) && to100(v) >= to100(lowest)) {
+    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
+    ctx.notes.push("지원구간에 따라 백분위 기준이 달라요(" + fmtPercent(lowest) + "~" + fmtPercent(min) +
+      "점). 지원구간을 확인하면 정확히 판정할 수 있어요.");
+    return;
+  }
+  // 경고제 예외 구간: 기준 미만이지만 경고제 최소 점수 이상이면 확인 필요
+  if (warnMin !== null && to100(v) < to100(min) && to100(v) >= to100(warnMin)) {
+    ctx.rows.push({ label: label, text: "경고제 대상 · 확인 필요", state: "unknown" });
+    ctx.notes.push(warning.note);
+    return;
+  }
+
+  // 남은 경우: 기준 이상(통과) 또는 가장 낮은 기준보다도 낮음(미달 → 가장 낮은 기준과 비교)
+  const compareTo = varies && to100(v) < to100(lowest) ? lowest : min;
+  compareMin(ctx, {
+    label: label, word: "백분위", min: compareTo, value: v,
+    fmt: fmtPercent, unit: "점", nearLimit: NEAR_MISS.percent,
+    goal: "다음 학기 백분위 점수를 " + fmtPercent(min) + "점 이상으로 올리면 받을 수 있어요."
+  });
+}
+
+// 3) 직전 학기 이수학점
+function judgeCredits(ctx, s, input) {
+  if (s.minCredits === null) return;
+  if (s.minCredits === "모름") {
+    ctx.rows.push({ label: "이수학점", text: "확인 필요", state: "unknown" });
+    ctx.notes.push("이수학점 기준이 공고에 나와 있지 않아요. 공고를 확인해 주세요.");
+    return;
+  }
+  const gap = s.minCredits - input.credits;
+  if (gap <= 0) {
+    ctx.rows.push({ label: "이수학점", text: s.minCredits + "학점 이상 · 충족", state: "pass" });
+  } else if (gap <= NEAR_MISS.credits) {
+    ctx.rows.push({ label: "이수학점", text: gap + "학점 부족 (기준 " + s.minCredits + "학점 이상)", state: "short" });
+    ctx.goals.push("다음 학기에 " + s.minCredits + "학점 이상 이수하면 받을 수 있어요.");
+  } else {
+    ctx.rows.push({ label: "이수학점", text: gap + "학점 부족 (기준 " + s.minCredits + "학점 이상)", state: "fail" });
+    ctx.reasons.push("이수학점 기준 미달");
+  }
+}
+
+// 첫 학기: 성적기준 미적용 장학금은 통과, 아니면(false·"모름") 확인 불가
+function judgeFirstTerm(ctx, s) {
+  const labels = [];
+  if (s.minGpa !== null) labels.push("평점");
+  if (s.minPercent !== null) labels.push("백분위");
+  if (s.minCredits !== null) labels.push("이수학점");
+  if (labels.length === 0) return;
+
+  const exempt = s.firstTermExempt === true;
+  labels.forEach(function (name) {
+    ctx.rows.push(exempt
+      ? { label: name, text: "첫 학기 미적용 · 통과", state: "pass" }
+      : { label: name, text: "확인 필요", state: "unknown" });
+  });
+  if (!exempt) {
+    ctx.notes.push(s.firstTermExempt === "모름"
+      ? "첫 학기 학생에게 성적 기준을 적용하는지 공고에 나와 있지 않아요. 공고를 확인해 주세요."
+      : "첫 학기 학생도 성적 기준이 적용돼요. 직전 학기 성적이 나오면 " + labels.join("·") + " 조건을 판정할 수 있어요.");
+  }
+}
+
+// 4) 학자금 지원구간 (하한 ≤ 입력 ≤ 상한일 때만 통과)
+function judgeIncome(ctx, s, income) {
+  const lo = s.incomeMin;
+  const hi = s.incomeMax;
+  if (lo === null && hi === null) return; // 지원구간 조건 없음
+
+  const label = "학자금 지원구간";
+  const loNum = typeof lo === "number" ? lo : null;
+  const hiNum = typeof hi === "number" ? hi : null;
+  const hasUnknown = lo === "모름" || hi === "모름";
+
+  // 기준 범위 글자 (예: 1~3구간 / 9구간 이하 / 기초·차상위만 / 9구간만)
+  function name(n) { return n === 0 ? "기초·차상위" : n + "구간"; }
+  let range;
+  if (hiNum === 0 && (loNum === null || loNum === 0)) range = "기초·차상위만";
+  else if (loNum !== null && hiNum !== null) range = loNum === hiNum ? name(loNum) + "만" : loNum + "~" + hiNum + "구간";
+  else if (hiNum !== null) range = name(hiNum) + " 이하";
+  else if (loNum !== null) range = name(loNum) + " 이상";
+  else range = "공고 확인 필요";
+
+  // 사용자가 "모름"을 고른 경우
+  if (income === null) {
+    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
+    ctx.notes.push("학자금 지원구간을 확인하면 정확히 판정할 수 있어요. (기준: " + range + ")");
+    return;
+  }
+
+  // 알려진 경계를 벗어나면 확실히 미달
+  if (!inIncomeRange(income, loNum, hiNum)) {
+    ctx.rows.push({ label: label, text: range + " 대상", state: "fail" });
+    ctx.reasons.push("지원구간 대상 아님");
+    return;
+  }
+
+  // 경계 중 데이터가 "모름"인 쪽이 있으면 확인 불가
+  if (hasUnknown) {
+    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
+    ctx.notes.push("지급 가능한 지원구간이 정해져 있지 않거나 매 학기 바뀌어요. 공고를 확인해 주세요.");
+    return;
+  }
+
+  ctx.rows.push({ label: label, text: range + " · 충족", state: "pass" });
 }
 
 function judgeScholarship(s, input) {
@@ -366,74 +443,22 @@ function judgeScholarship(s, input) {
     notes: []     // 확인 불가 조건마다 무엇을 확인해야 하는지
   };
 
-  // 1) 학년
-  const gr = s.gradeRange;
-  if (gr && (gr.min !== null || gr.max !== null)) {
-    let target;
-    if (gr.min !== null && gr.max !== null) target = gr.min === gr.max ? gr.min + "학년" : gr.min + "~" + gr.max + "학년";
-    else if (gr.min !== null) target = gr.min + "학년 이상";
-    else target = gr.max + "학년 이하";
-    const inRange = (gr.min === null || input.grade >= gr.min) && (gr.max === null || input.grade <= gr.max);
-    if (inRange) {
-      ctx.rows.push({ label: "학년", text: target + " 대상 · 통과", state: "pass" });
-    } else {
-      ctx.rows.push({ label: "학년", text: target + " 대상", state: "fail" });
-      ctx.reasons.push("학년 대상 아님");
-    }
-  }
-
-  // 2) 성적 조건 (평점·백분율·이수학점)
-  const hasScore = s.minGpa !== null || s.minPercent !== null || s.minCredits !== null;
-  if (input.firstTerm && hasScore) {
-    // 첫 학기: 성적기준 미적용 장학금은 통과, 아니면 확인 불가
-    const labels = [];
-    if (s.minGpa !== null) labels.push("평점");
-    if (s.minPercent !== null) labels.push("백분율");
-    if (s.minCredits !== null) labels.push("이수학점");
-    labels.forEach(function (name) {
-      if (s.firstTermExempt) {
-        ctx.rows.push({ label: name, text: "첫 학기 미적용 · 통과", state: "pass" });
-      } else {
-        ctx.rows.push({ label: name, text: "확인 필요", state: "unknown" });
-      }
-    });
-    if (!s.firstTermExempt) {
-      ctx.notes.push("직전 학기 성적이 나오면 " + labels.join("·") + " 조건을 판정할 수 있어요.");
-    }
+  // 성적 조건
+  if (input.firstTerm) {
+    judgeFirstTerm(ctx, s);
   } else {
-    const sv = scoreValues(input);
-    // 평점: "둘다"면 직전 학기와 누적을 각각 판정 (하나라도 미달이면 미달 → 전체 규칙이 처리)
-    basisList(s.scoreBasis).forEach(function (which) {
-      if (s.minGpa !== null) judgeScore(ctx, s, "gpa", which, which === "prev" ? sv.prevGpa : sv.cumGpa);
-    });
-    basisList(s.scoreBasis).forEach(function (which) {
-      if (s.minPercent !== null) judgeScore(ctx, s, "percent", which, which === "prev" ? sv.prevPercent : sv.cumPercent);
-    });
-
-    // 이수학점 (항상 "이상")
-    if (s.minCredits !== null) {
-      if (input.credits >= s.minCredits) {
-        ctx.rows.push({ label: "이수학점", text: s.minCredits + "학점 이상 · 충족", state: "pass" });
-      } else {
-        const gap = s.minCredits - input.credits;
-        if (gap <= NEAR_MISS.credits) {
-          ctx.rows.push({ label: "이수학점", text: gap + "학점 부족", state: "short" });
-          ctx.goals.push("다음 학기에 " + s.minCredits + "학점 이상 이수하면 받을 수 있어요.");
-        } else {
-          ctx.rows.push({ label: "이수학점", text: gap + "학점 부족", state: "fail" });
-          ctx.reasons.push("이수학점 기준 미달");
-        }
-      }
-    }
+    judgeGpa(ctx, s, input);
+    judgePercent(ctx, s, input);
+    judgeCredits(ctx, s, input);
   }
 
-  // 3) 학자금 지원구간 (하한 이상 + 상한 이하일 때만 통과)
+  // 지원구간
   judgeIncome(ctx, s, input.income);
 
-  // 4) 기타 조건 (자동 판정 불가 → 항상 확인 불가)
-  (s.otherConditions || []).forEach(function (cond) {
-    ctx.rows.push({ label: cond, text: "확인 필요", state: "unknown" });
-    ctx.notes.push(cond + ": 학교 공지에서 직접 확인해 주세요.");
+  // 자동 판정이 안 되는 필수 확인 조건 (항상 확인 불가)
+  (s.manualChecks || []).forEach(function (m) {
+    ctx.rows.push({ label: m.label, text: "확인 필요", state: "unknown" });
+    ctx.notes.push(m.note);
   });
 
   // 전체 판정 (미달 > 확인 불가 > 통과)
@@ -453,59 +478,9 @@ function judgeScholarship(s, input) {
   };
 }
 
-// 학자금 지원구간 판정
-function judgeIncome(ctx, s, income) {
-  const lo = s.incomeMin;
-  const hi = s.incomeMax;
-  if (lo === null && hi === null) return; // 지원구간 조건 없음
-
-  const label = "학자금 지원구간";
-  const loUnknown = lo === "모름";
-  const hiUnknown = hi === "모름";
-  const loNum = typeof lo === "number" ? lo : null;
-  const hiNum = typeof hi === "number" ? hi : null;
-
-  // 기준 범위 글자 (예: 4~8구간 / 8구간 이하 / 4구간 이상 / 9구간만)
-  let range;
-  if (loNum !== null && hiNum !== null) {
-    range = loNum === hiNum ? incomeName(loNum) + "만" : (loNum === 0 ? "기초·차상위" : loNum) + "~" + hiNum + "구간";
-  } else if (hiNum !== null) {
-    range = incomeName(hiNum) + " 이하";
-  } else if (loNum !== null) {
-    range = incomeName(loNum) + " 이상";
-  } else {
-    range = "원문 확인 필요";
-  }
-
-  // 사용자가 "모름"을 고른 경우
-  if (income === null) {
-    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
-    ctx.notes.push("학자금 지원구간을 확인하면 정확히 판정할 수 있어요. (기준: " + range + ")");
-    return;
-  }
-
-  // 알려진 경계부터 비교: 하나라도 벗어나면 확실히 미달
-  const belowMin = loNum !== null && income < loNum;
-  const aboveMax = hiNum !== null && income > hiNum;
-  if (belowMin || aboveMax) {
-    ctx.rows.push({ label: label, text: range + " 대상", state: "fail" });
-    ctx.reasons.push("지원구간 대상 아님");
-    return;
-  }
-
-  // 경계 중 데이터가 "모름"인 쪽이 있으면 확인 불가
-  if (loUnknown || hiUnknown) {
-    ctx.rows.push({ label: label, text: "확인 필요", state: "unknown" });
-    ctx.notes.push("이 장학금의 지원구간 기준을 아직 확인하지 못했어요. 공지를 직접 확인해 주세요.");
-    return;
-  }
-
-  ctx.rows.push({ label: label, text: range + " · 충족", state: "pass" });
-}
-
 // -----------------------------------------------------
 // 화면 그리기 도우미
-// (사용자 입력이 섞일 수 있는 글자는 모두 textContent로 넣음)
+// (사용자 입력이나 데이터 글자는 모두 textContent로 넣음)
 // -----------------------------------------------------
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -518,26 +493,35 @@ function el(tag, className, text) {
 const ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>';
 const ICON_WARN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v6"></path><path d="M12 17h.01"></path></svg>';
 const ICON_QUESTION = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9a3 3 0 1 1 4 2.8c-.6.3-1 .9-1 1.6V14"></path><path d="M12 18h.01"></path></svg>';
+const ICON_X = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M17 7L7 17"></path></svg>';
 
-function makeBadge(kind, iconSvg, text) {
-  const badge = el("span", "badge " + kind);
-  badge.innerHTML = iconSvg;
-  badge.appendChild(document.createTextNode(text));
+// 상태별 배지 모양
+const BADGES = {
+  pass: { icon: ICON_CHECK, text: "충족" },
+  check: { icon: ICON_QUESTION, text: "확인 필요" },
+  near: { icon: ICON_WARN, text: "조금 부족" },
+  none: { icon: ICON_X, text: "해당 없음" }
+};
+
+function makeBadge(status) {
+  const badge = el("span", "badge " + status);
+  badge.innerHTML = BADGES[status].icon;
+  badge.appendChild(document.createTextNode(BADGES[status].text));
   return badge;
 }
 
 // 카드 윗부분: 태그 + 장학금 이름 + 배지
-function makeCardHead(s, badge) {
+function makeCardHead(s, status) {
   const head = el("div", "sch-head");
   const left = el("div");
   left.appendChild(el("span", "tag", s.type));
   left.appendChild(el("h3", null, s.name));
   head.appendChild(left);
-  head.appendChild(badge);
+  head.appendChild(makeBadge(status));
   return head;
 }
 
-// 조건별 줄 목록 (통과: 기본색 / 미달: 주황 / 확인 불가: 파랑)
+// 조건별 판정 줄 (통과: 기본색 / 미달: 주황 / 확인 불가: 파랑)
 function makeCriteria(rows) {
   const judgeClass = { pass: "judge", short: "judge short", fail: "judge short", unknown: "judge unknown" };
   const ul = el("ul", "criteria");
@@ -559,18 +543,44 @@ function makeGoalBox(sentences) {
   return box;
 }
 
-// 카드 아래: 지원 금액 + 기준 원문 링크
+// 기타 조건: 접기/펼치기 (원문 줄바꿈 그대로)
+function makeOtherConditions(text) {
+  const details = el("details", "conditions");
+  details.appendChild(el("summary", null, "기타 조건 보기"));
+  details.appendChild(el("p", null, text));
+  return details;
+}
+
+// 카드 아래: 지원 금액 + 공고 보기 (새 탭)
 function makeCardFoot(s) {
   const foot = el("div", "sch-foot");
   foot.appendChild(el("span", null, "지원 금액 " + s.amount));
-  const link = el("a", null, "기준 원문 보기");
-  link.href = s.sourceUrl || "#";
-  if (link.getAttribute("href") !== "#") {
+  if (s.sourceUrl) {
+    const link = el("a", null, "공고 보기");
+    link.href = s.sourceUrl;
     link.target = "_blank";
     link.rel = "noopener";
+    foot.appendChild(link);
   }
-  foot.appendChild(link);
   return foot;
+}
+
+// 장학금 카드 하나 (네 상태 공통 구조, 해당 없음은 회색 톤)
+function renderCard(j) {
+  const card = el("article", "white-card sch-card" + (j.status === "none" ? " is-none" : ""));
+  card.appendChild(makeCardHead(j.s, j.status));
+  card.appendChild(makeCriteria(j.rows));
+
+  // 판정 이유 안내: 해당 없음 → 사유, 조금 부족 → 목표 + 확인할 것, 확인 필요 → 확인할 것
+  let sentences = [];
+  if (j.status === "none") sentences = ["해당되지 않는 이유: " + j.reasons.join(", ")];
+  else if (j.status === "near") sentences = j.goals.concat(j.checkNotes);
+  else if (j.status === "check") sentences = j.checkNotes;
+  if (sentences.length > 0) card.appendChild(makeGoalBox(sentences));
+
+  if (j.s.otherConditions) card.appendChild(makeOtherConditions(j.s.otherConditions));
+  card.appendChild(makeCardFoot(j.s));
+  return card;
 }
 
 // -----------------------------------------------------
@@ -595,15 +605,13 @@ function renderSummary(input, groups) {
     title.appendChild(document.createTextNode("장학금이 없어요"));
   }
 
-  // 입력값 칩 (선택 입력은 입력했을 때만)
+  // 입력값 칩 (백분위는 입력했을 때만)
   const chips = document.getElementById("summary-chips");
-  chips.appendChild(el("span", "chip", input.grade + "학년"));
   if (input.firstTerm) {
     chips.appendChild(el("span", "chip", "첫 학기 (성적 없음)"));
   } else {
-    chips.appendChild(el("span", "chip", "직전 평점 " + fmtGpa(input.gpa)));
-    if (input.cumGpa !== null) chips.appendChild(el("span", "chip", "누적 평점 " + fmtGpa(input.cumGpa)));
-    if (input.percent !== null) chips.appendChild(el("span", "chip", "백분율 " + fmtPercent(input.percent)));
+    chips.appendChild(el("span", "chip", "평점 " + fmtGpa(input.gpa)));
+    if (input.percent !== null) chips.appendChild(el("span", "chip", "백분위 " + fmtPercent(input.percent)));
     chips.appendChild(el("span", "chip", input.credits + "학점"));
   }
   chips.appendChild(el("span", "chip", incomeLabel(input.income)));
@@ -615,7 +623,7 @@ function renderSummary(input, groups) {
 }
 
 // 묶음 하나 그리기 (비어 있으면 섹션 제목까지 숨김)
-function renderGroup(listId, items, renderCard) {
+function renderGroup(listId, items) {
   const list = document.getElementById(listId);
   const section = list.closest(".result-group");
   if (items.length === 0) {
@@ -625,43 +633,4 @@ function renderGroup(listId, items, renderCard) {
   items.forEach(function (item) {
     list.appendChild(renderCard(item));
   });
-}
-
-// 충족 카드
-function renderPassCard(j) {
-  const card = el("article", "white-card sch-card");
-  card.appendChild(makeCardHead(j.s, makeBadge("pass", ICON_CHECK, "충족")));
-  card.appendChild(makeCriteria(j.rows));
-  card.appendChild(makeCardFoot(j.s));
-  return card;
-}
-
-// 확인 필요 카드: 어떤 조건을 확인해야 하는지 문장으로 안내
-function renderCheckCard(j) {
-  const card = el("article", "white-card sch-card");
-  card.appendChild(makeCardHead(j.s, makeBadge("check", ICON_QUESTION, "확인 필요")));
-  card.appendChild(makeCriteria(j.rows));
-  card.appendChild(makeGoalBox(j.checkNotes));
-  card.appendChild(makeCardFoot(j.s));
-  return card;
-}
-
-// 조금 부족 카드: 목표 안내 + (있다면) 확인할 조건 안내
-function renderNearCard(j) {
-  const card = el("article", "white-card sch-card");
-  card.appendChild(makeCardHead(j.s, makeBadge("near", ICON_WARN, "조금 부족")));
-  card.appendChild(makeCriteria(j.rows));
-  card.appendChild(makeGoalBox(j.goals.concat(j.checkNotes)));
-  return card;
-}
-
-// 해당 없음 한 줄 카드
-function renderNoneCard(j) {
-  const card = el("article", "white-card none-card");
-  const left = el("div");
-  left.appendChild(el("span", "tag", j.s.type));
-  left.appendChild(el("h3", null, j.s.name));
-  card.appendChild(left);
-  card.appendChild(el("span", "reason", j.reasons.join(", ")));
-  return card;
 }

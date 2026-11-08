@@ -466,16 +466,6 @@ h1, h2, h3, p {
   cursor: pointer;
 }
 
-/* 2학년 이상이면 첫 학기 체크박스를 흐리게 */
-.first-term.is-disabled {
-  opacity: 0.45;
-}
-
-.first-term.is-disabled .check-row,
-.first-term.is-disabled .check-row input {
-  cursor: not-allowed;
-}
-
 /* 첫 학기 체크 시 꺼진 성적 칸 */
 .field.is-disabled {
   opacity: 0.45;
@@ -715,31 +705,68 @@ h1, h2, h3, p {
   margin-top: 4px;
 }
 
-/* 해당 없음 한 줄 카드 */
-.none-card {
+/* 해당 없음 카드: 같은 구조, 회색 톤으로 한 단계 약하게 */
+.sch-card.is-none {
   padding: 24px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: 16px;
 }
 
-.none-card > div {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.none-card h3 {
+.sch-card.is-none h3 {
   font-size: 18px;
   font-weight: 700;
   color: var(--text-sub);
 }
 
-.none-card .reason {
+.sch-card.is-none .criteria {
   font-size: 15px;
-  color: var(--text-weak);
-  text-align: right;
+  color: var(--text-sub);
+}
+
+.badge.none { background: var(--gray-bg); color: var(--text-sub); }
+
+/* 기타 조건 접기/펼치기 */
+.conditions {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 15px;
+  color: var(--text-sub);
+}
+
+.conditions summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.conditions summary::-webkit-details-marker {
+  display: none;
+}
+
+/* 펼침 표시 화살표 */
+.conditions summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-right: 2px solid var(--text-weak);
+  border-bottom: 2px solid var(--text-weak);
+  transform: rotate(45deg);
+  transition: transform 0.15s;
+}
+
+.conditions[open] summary::after {
+  transform: rotate(-135deg);
+}
+
+/* 원문 줄바꿈 그대로 표시 */
+.conditions p {
+  padding: 0 20px 16px;
+  line-height: 1.7;
+  white-space: pre-line;
 }
 
 /* 결과 묶음 (충족 / 조금 부족 / 해당 없음) */
